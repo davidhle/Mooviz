@@ -1,12 +1,33 @@
 <!DOCTYPE html>
-<style> /* set the CSS */
+<meta charset="utf-8">
 
-text {
-  font-family: sans-serif;
+<!-- Original Source https://bl.ocks.org/mbostock/3887118 -->
+
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.dot {
+  stroke: #000;
+}
+
+.tooltip {
+  position: absolute;
+  width: 200px;
+  height: 28px;
+  pointer-events: none;
 }
 
 </style>
-
 <body>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
@@ -145,4 +166,3 @@ d3.csv("data/data.csv", function(error, data) {
 });
 
 </script>
-
