@@ -49,7 +49,7 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
     height = 500 - margin.top - margin.bottom;
 
 // specify type of scale and range of the x axis
-var x = d3.time.scale().range([0, width]);
+var x = d3.time.scale().range([0, width - 120]);
 
 //specify type of scale and range of the y axis
 var y = d3.scale.linear()
@@ -65,6 +65,7 @@ var xAxis = d3.svg.axis()
 
 // set up y axis
 var yAxis = d3.svg.axis()
+.tickFormat(d3.format("s"))
     .scale(y)
     .orient("left");
 
@@ -82,7 +83,8 @@ d3.csv("data/data.csv", function(error, data) {
   // get the values in the right format
   data.forEach(function(d) {
     //log scale to better see data
-    d.sales = Math.log(+d.sales);
+    //d.sales = Math.log(+d.salesAdj);
+    d.sales = +d.salesAdj;
     d.date = format(d.date);
   });
 
@@ -90,8 +92,11 @@ d3.csv("data/data.csv", function(error, data) {
   x.domain(d3.extent(data, function(d) { return d.date; }));
     y.domain([0, d3.max(data, function(d) { return d.sales; })]);
 
+
+  var g = svg.append("g");
+
     //put the x axis on
-  svg.append("g")
+  g.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
@@ -103,7 +108,7 @@ d3.csv("data/data.csv", function(error, data) {
       .text("date");
 
       // put the y axis on
-  svg.append("g")
+  g.append("g")
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
@@ -115,7 +120,7 @@ d3.csv("data/data.csv", function(error, data) {
       .text("Earnings")
 
       //put all the dots on
-  svg.selectAll(".dot")
+  g.selectAll(".dot")
       .data(data)
     .enter().append("circle")
       .attr("class", "dot")
@@ -128,7 +133,7 @@ d3.csv("data/data.csv", function(error, data) {
                .duration(200)
                .style("opacity", .9);
           tooltip.html(d["title"] + "<br/> (" + d.genre
-            + ", " + d.sales + ")")
+            + ", " + d.sales.toLocaleString() + ")")
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");
       })
