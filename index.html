@@ -34,6 +34,8 @@ body {
 </style>
 <body>
 <script src="//d3js.org/d3.v3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 <script>
 
 //setup formula for date format that will be used later
@@ -41,6 +43,8 @@ var format = function(input) {
     return (new Date(input)).getTime();
 }
 
+// variable for storing which of the genres are selected
+var selectedGenres = {};
 
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
@@ -110,6 +114,7 @@ d3.csv("data/data.csv", function(error, data) {
     //d.sales = Math.log(+d.salesAdj);
     d.sales = +d.salesAdj;
     d.date = format(d.date);
+    d.genreClean = d.genre.replace(/\s+/, "").replace('/', '');
   });
 
 
@@ -179,11 +184,12 @@ overview.append("g")
   g.selectAll(".dot")
       .data(data)
     .enter().append("circle")
-      .attr("class", "dot")
       .attr("r", 2)
+      .attr("class", function(d) {return "dot " + d.genreClean; } )
       .attr("cx", function(d) { return x(d.date); }) //x coordinate of dot
       .attr("cy", function(d) { return y(d.sales); }) // y coordinate of dot
-      .style("fill", function(d) { return color(d.genre); }) // gives dot color
+      .attr("color",function(d) {return color(d.genreClean); }) //in order to select for genre
+      .style("fill", function(d) { return color(d.genreClean); }) // gives dot color
       .on("mouseover", function(d) {
           tooltip.transition()
                .duration(200)
@@ -210,16 +216,27 @@ overview.append("g")
       .attr("x", width - 18)
       .attr("width", 18)
       .attr("height", 18)
-      .style("fill", color);
+      .attr("color", color)
+      .attr("class", function(d) {
+        return "legend" + d;
+      })
+      .style("fill", color)
+      .on('click', function(d) {
+        toggle(d);
+        showHideDots();
+      });
 
   legend.append("text")
       .attr("x", width - 24)
       .attr("y", 9)
       .attr("dy", ".35em")
       .style("text-anchor", "end")
-      .text(function(d) { return d; });
+      .text(function(d) {
+        selectedGenres[d] = false;
+        return d; });
 
 });
+
 //This is the brush function that allows us to pan/zoom the camera
 function brushed() {
         // update the main chart's x axis data range
@@ -230,4 +247,44 @@ function brushed() {
         // redraw the x axis of the main chart
         svg.select(".x.axis").call(xAxis);
     }
+
+function toggle(genre) {
+  selectedGenres[genre] = !selectedGenres[genre];
+}
+
+function showHideDots() {
+
+  var showAll = true;
+
+  for (var genre in selectedGenres) {
+    if (selectedGenres[genre] == true) {
+      showAll = false;
+      $("." + genre).css("visibility","visible");
+      $(".legend" + genre).css("opacity",.9);
+    } else {
+      $("." + genre).css("visibility","collapse");
+      $(".legend" + genre).css("opacity",.3);
+    }
+  }
+
+  if (showAll) {
+    $(".dot").css("visibility","visible");
+    $(".legend rect").css("opacity",.9);
+  }
+}
+
+// $(document).ready(function() {
+//   console.log("ready!");
+
+//   $('.legend rect').click(function() {
+//     var color = $(this).attr('color');
+//     console.log(color);
+//     $(".dot").each(function() {
+//       if ($(this).css("fill") == color) {
+//         $(this).hide();
+//       }
+//     });
+//   });
+
+// })
 </script>
