@@ -55,7 +55,7 @@ var tooltip = d3.select("body").append("div")
 var margin = {top: 20, right: 20, bottom: 80, left: 40},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
-    marginOverview = { top: 430, right: margin.right, bottom: 20,  left: margin.left},
+    marginOverview = { top: 430, right: margin.right, bottom: 35,  left: margin.left},
     heightOverview = 500 - marginOverview.top - marginOverview.bottom;
 // specify type of scale and range of the x axis
 var x = d3.time.scale().range([0, width - 150]);
@@ -91,6 +91,10 @@ var xAxisOverview = d3.svg.axis()
                     .orient("bottom");
 // set up svg
 var svg = d3.select("body").append("svg")
+    .attr("width", width - 150)
+    .attr("height", height + margin.top + margin.bottom);
+
+var svg2 = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom);
     
@@ -110,7 +114,7 @@ var brush = d3.svg.brush()
 var g = svg.append("g")
             .attr("transform", "translate(" + margin.left  + "," + margin.top + ")");
 
-  var g2 = svg.append("g")
+  var g2 = svg2.append("g")
     .attr("transform", "translate(" + 50 + ",0)")
     .attr("class", "Test");
 
@@ -204,7 +208,8 @@ overview.append("g")
           tooltip.html(d["title"] + "<br/> (" + d.genre
             + ", " + d.sales.toLocaleString() + ")")
                .style("left", (d3.event.pageX + 5) + "px")
-               .style("top", (d3.event.pageY - 28) + "px");
+               .style("top", (d3.event.pageY - 28) + "px")
+               .style("right", (d3.event.pageX - 150 + "px"));
       })
       .on("mouseout", function(d) {
           tooltip.transition()
@@ -251,9 +256,9 @@ function brushed() {
         x.domain(brush.empty() ? xOverview.domain() : brush.extent());
         // redraw the bars on the main chart
         g.selectAll(".dot")
-                .attr("transform", function(d) { return "translate(" + x(d.date) + ",0)"; })
+                .attr("cx", function(d) { return x(d.date); })
         // redraw the x axis of the main chart
-        svg.select(".x.axis").call(xAxis);
+        g.select(".x.axis").call(xAxis);
     }
 
 function toggle(genre) {
