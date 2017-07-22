@@ -126,21 +126,35 @@ d3.csv("data/data.csv", function(error, data) {
   // get the values in the right format
   data.forEach(function(d) {
     //log scale to better see data
-    //d.sales = Math.log(+d.salesAdj);
+    d.salesLog = Math.log(+d.salesAdj);
     d.sales = +d.salesAdj;
     d.date = format(d.date);
     d.genreClean = d.genre.replace(/\s+/, "").replace('/', '');
   });
 
 
+  var maxSales = d3.max(data, function(d) { return d.sales; });
+    var maxSalesLog = d3.max(data, function(d) { return d.salesLog; });
+
+
   // specify domains for x and y
   x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([0, d3.max(data, function(d) { return d.sales; })]);
+    y.domain([.1, maxSales]);
+
   //These are the domains for the bottom zoom
   xOverview.domain(x.domain());
   yOverview.domain(y.domain());
 
-  
+
+    // stuff for log axis
+var logTickValues = [];
+var logNumOfTicks = 10;
+    for (var i = 10; i < maxSales; i*=10) {
+      logTickValues.push(i);
+    }
+
+  var g = svg.append("g");
+
 
     //put the x axis on
   g.append("g")
@@ -188,6 +202,8 @@ overview.append("g")
                 // over the full height of the overview chart
                 .attr("height", heightOverview + 7);  // +7 is magic number for styling
 
+      //put all the dots on
+
 
 
 
@@ -199,7 +215,7 @@ overview.append("g")
       .attr("class", function(d) {return "dot " + d.genreClean; } )
       .attr("cx", function(d) { return x(d.date); }) //x coordinate of dot
       .attr("cy", function(d) { return y(d.sales); }) // y coordinate of dot
-      .attr("color",function(d) {return color(d.genreClean); }) //in order to select for genre
+      .attr("sales", function(d) { return d.sales; }) // sae
       .style("fill", function(d) { return color(d.genreClean); }) // gives dot color
       .on("mouseover", function(d) {
           tooltip.transition()
@@ -248,6 +264,48 @@ overview.append("g")
         selectedGenres[d] = false;
         return d; });
 
+  d3.select("#logCheck").on("change", updateYAxis);
+
+    // ** Update data section (Called from the onclick)
+    function updateYAxis() {
+      if ($('#logCheck').prop("checked") == true) {
+
+        y = d3.scale.log()
+        .range([height, 0]);
+
+        yAxis = d3.svg.axis()
+        .tickFormat(d3.format("s"))
+        .scale(y)
+        .orient("left");
+
+        yAxis.tickValues(logTickValues);
+      } else {
+        y = d3.scale.linear()
+        .range([height, 0]);
+
+        yAxis = d3.svg.axis()
+        .tickFormat(d3.format("s"))
+        .scale(y)
+        .orient("left");
+      }
+
+          // Scale the range of the data again
+          y.domain([.001, maxSales]);
+
+          // Select the section we want to apply our changes to
+          var svg = d3.select("body").transition();
+
+        // Make the changes
+            svg.select(".y.axis") // change the y axis
+            .duration(750)
+            .call(yAxis);
+
+            g.selectAll('.dot')
+              .attr("cy", function(d) { return y(d.sales); });
+          }
+
+
+
 });
 
 //This is the brush function that allows us to pan/zoom the camera
@@ -286,18 +344,8 @@ function showHideDots() {
   }
 }
 
-// $(document).ready(function() {
-//   console.log("ready!");
-
-//   $('.legend rect').click(function() {
-//     var color = $(this).attr('color');
-//     console.log(color);
-//     $(".dot").each(function() {
-//       if ($(this).css("fill") == color) {
-//         $(this).hide();
-//       }
-//     });
-//   });
-
-// })
 </script>
+<br>
+    <input type="checkbox" id="logCheck"> Log Scale
+</body>
+
