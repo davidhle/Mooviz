@@ -58,7 +58,7 @@ var margin = {top: 20, right: 20, bottom: 80, left: 40},
     marginOverview = { top: 430, right: margin.right, bottom: 35,  left: margin.left},
     heightOverview = 500 - marginOverview.top - marginOverview.bottom;
 // specify type of scale and range of the x axis
-var x = d3.time.scale().range([0, width - 150]);
+var x = d3.time.scale().range([0, width - 90]);
 
 //specify type of scale and range of the y axis
 var y = d3.scale.linear()
@@ -80,7 +80,7 @@ var yAxis = d3.svg.axis()
 
 //Set up axis for the overview / zoom bar
 var xOverview = d3.time.scale()
-                .range([0, width - 150]);
+                .range([0, width - 90]);
 
 
 var yOverview = d3.scale.linear()
@@ -91,7 +91,7 @@ var xAxisOverview = d3.svg.axis()
                     .orient("bottom");
 // set up svg
 var svg = d3.select("body").append("svg")
-    .attr("width", width - 150)
+    .attr("width", width - 40)
     .attr("height", height + margin.top + margin.bottom);
 
 var svg2 = d3.select("body").append("svg")
@@ -149,7 +149,7 @@ d3.csv("data/data.csv", function(error, data) {
       .call(xAxis)
     .append("text")
       .attr("class", "label")
-      .attr("x", width - 120)
+      .attr("x", width - 80)
       .attr("y", heightOverview - 10)
       .style("text-anchor", "end")
       .text("date");
@@ -226,7 +226,7 @@ overview.append("g")
 
 
   legend.append("rect")
-      .attr("x", 150 - 18)
+      .attr("x", 90 - 18)
       .attr("width", 18)
       .attr("height", 18)
       .attr("color", color)
@@ -240,7 +240,7 @@ overview.append("g")
       });
 
   legend.append("text")
-      .attr("x", 150 - 24)
+      .attr("x", 90 - 24)
       .attr("y", 9)
       .attr("dy", ".35em")
       .style("text-anchor", "end")
