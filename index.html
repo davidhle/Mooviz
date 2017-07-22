@@ -20,9 +20,9 @@ body {
       fill-opacity: .125;
       shape-rendering: crispEdges;
     }
-.dot {
+/*.dot {
   stroke: #000;
-}
+}*/
 
 .tooltip {
   position: absolute;
@@ -55,10 +55,10 @@ var tooltip = d3.select("body").append("div")
 var margin = {top: 20, right: 20, bottom: 80, left: 40},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
-    marginOverview = { top: 430, right: margin.right, bottom: 20,  left: margin.left - 40},
+    marginOverview = { top: 430, right: margin.right, bottom: 35,  left: margin.left},
     heightOverview = 500 - marginOverview.top - marginOverview.bottom;
 // specify type of scale and range of the x axis
-var x = d3.time.scale().range([0, width - 120]);
+var x = d3.time.scale().range([0, width - 150]);
 
 //specify type of scale and range of the y axis
 var y = d3.scale.linear()
@@ -80,7 +80,9 @@ var yAxis = d3.svg.axis()
 
 //Set up axis for the overview / zoom bar
 var xOverview = d3.time.scale()
-                .range([0, width - 110]);
+                .range([0, width - 150]);
+
+
 var yOverview = d3.scale.linear()
                 .range([heightOverview, 0]);
 //Rendering for the x axis
@@ -89,20 +91,33 @@ var xAxisOverview = d3.svg.axis()
                     .orient("bottom");
 // set up svg
 var svg = d3.select("body").append("svg")
+    .attr("width", width - 150)
+    .attr("height", height + margin.top + margin.bottom);
+
+var svg2 = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("height", height + margin.top + margin.bottom);
+    
 
 //svg for the bar itself
  var overview = svg.append("g")
                 .attr("class", "overview")
-                .attr("transform", "translate(" + marginOverview.left + "," + marginOverview.top + ")");
+                .attr("transform", "translate(" + marginOverview.left +"," + marginOverview.top + ")");
+
 
 //The zoom and pan function of the bottom bar
 var brush = d3.svg.brush()
                         .x(xOverview)
                         .on("brush", brushed);
+
+//Declare g and g2
+var g = svg.append("g")
+            .attr("transform", "translate(" + margin.left  + "," + margin.top + ")");
+
+  var g2 = svg2.append("g")
+    .attr("transform", "translate(" + 50 + ",0)")
+    .attr("class", "Test");
+
 
 // get the data and process it
 d3.csv("data/data.csv", function(error, data) {
@@ -140,6 +155,7 @@ var logNumOfTicks = 10;
 
   var g = svg.append("g");
 
+
     //put the x axis on
   g.append("g")
       .attr("class", "x axis")
@@ -147,8 +163,8 @@ var logNumOfTicks = 10;
       .call(xAxis)
     .append("text")
       .attr("class", "label")
-      .attr("x", width)
-      .attr("y", -6)
+      .attr("x", width - 120)
+      .attr("y", heightOverview - 10)
       .style("text-anchor", "end")
       .text("date");
 
@@ -170,24 +186,15 @@ var logNumOfTicks = 10;
             .attr("transform", "translate(0," + heightOverview + ")")
             .call(xAxisOverview);
 
-  //This is what made the Bars on the bottom bar for zooming
-  // overview.append("g")
-  //                   .attr("class", "dots")
-  //           .selectAll(".dot")
-  //           .data(data)
-  //           .enter().append("rect")
-  //               .attr("class", "dot")
-  //               .attr("x", function(d) { return xOverview(d.date) - 3; })
-  //               .attr("width", 6)
-  //               .attr("y", function(d) { return yOverview(d.sales); })
-  //               .attr("height", function(d) { return heightOverview - yOverview(d.sales); });
-          // add the brush target area on the overview chart
 
+// add the brush target area on the overview chart
 //This is the rectangle that highlights what part of the graph youre looking at
 overview.append("g")
             .attr("class", "x brush")
             .call(brush)
             .selectAll("rect")
+
+
                 // -6 is magic number to offset positions for styling/interaction to feel right
                 .attr("y", -6)
                 // need to manually set the height because the brush has
@@ -196,6 +203,11 @@ overview.append("g")
                 .attr("height", heightOverview + 7);  // +7 is magic number for styling
 
       //put all the dots on
+
+
+
+
+  //Put all the dots on
   g.selectAll(".dot")
       .data(data)
     .enter().append("circle")
@@ -212,7 +224,8 @@ overview.append("g")
           tooltip.html(d["title"] + "<br/> (" + d.genre
             + ", " + d.sales.toLocaleString() + ")")
                .style("left", (d3.event.pageX + 5) + "px")
-               .style("top", (d3.event.pageY - 28) + "px");
+               .style("top", (d3.event.pageY - 28) + "px")
+               .style("right", (d3.event.pageX - 150 + "px"));
       })
       .on("mouseout", function(d) {
           tooltip.transition()
@@ -221,11 +234,12 @@ overview.append("g")
            });
 
 // legend stuff
-  var legend = svg.selectAll(".legend")
+  var legend = g2.selectAll(".legend")
       .data(color.domain())
     .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
 
   legend.append("rect")
       .attr("x", width - 18)
@@ -299,10 +313,10 @@ function brushed() {
         // update the main chart's x axis data range
         x.domain(brush.empty() ? xOverview.domain() : brush.extent());
         // redraw the bars on the main chart
-        svg.selectAll(".dot")
-                .attr("transform", function(d) { return "translate(" + x(d.date) + ",0)"; })
+        g.selectAll(".dot")
+                .attr("cx", function(d) { return x(d.date); })
         // redraw the x axis of the main chart
-        svg.select(".x.axis").call(xAxis);
+        g.select(".x.axis").call(xAxis);
     }
 
 function toggle(genre) {
