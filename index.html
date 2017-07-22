@@ -97,7 +97,7 @@ var svg = d3.select("body").append("svg")
 var svg2 = d3.select("body").append("svg")
     .attr("width", 150 + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom);
-    
+
 
 //svg for the bar itself
  var overview = svg.append("g")
@@ -150,12 +150,12 @@ d3.csv("data/data.csv", function(error, data) {
 //   //This is a random comment to allow another pull request
 // =======
 
-//     // stuff for log axis
-// var logTickValues = [];
-// var logNumOfTicks = 10;
-//     for (var i = 10; i < maxSales; i*=10) {
-//       logTickValues.push(i);
-//     }
+    // stuff for log axis
+var logTickValues = [];
+var logNumOfTicks = 10;
+    for (var i = 10; i < maxSales; i*=10) {
+      logTickValues.push(i);
+    }
 
   //Dont uncomment this, itll create problems
 //   var g = svg.append("g");
