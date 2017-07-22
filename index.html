@@ -16,9 +16,7 @@ body {
   shape-rendering: crispEdges;
 }
 .brush .extent {
-      stroke: #fff;
-      fill-opacity: .125;
-      shape-rendering: crispEdges;
+        fill-opacity: .125;
     }
 /*.dot {
   stroke: #000;
@@ -97,7 +95,7 @@ var svg = d3.select("body").append("svg")
 var svg2 = d3.select("body").append("svg")
     .attr("width", 150 + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom);
-    
+
 
 //svg for the bar itself
  var overview = svg.append("g")
@@ -116,7 +114,7 @@ var g = svg.append("g")
 
   var g2 = svg2.append("g")
     .attr("transform", "translate(" + 50 + ",0)")
-    .attr("class", "Test");
+    .attr("id", "#legendContainer");
 
 
 // get the data and process it
@@ -150,12 +148,12 @@ d3.csv("data/data.csv", function(error, data) {
 //   //This is a random comment to allow another pull request
 // =======
 
-//     // stuff for log axis
-// var logTickValues = [];
-// var logNumOfTicks = 10;
-//     for (var i = 10; i < maxSales; i*=10) {
-//       logTickValues.push(i);
-//     }
+    // stuff for log axis
+var logTickValues = [];
+var logNumOfTicks = 10;
+    for (var i = 10; i < maxSales; i*=10) {
+      logTickValues.push(i);
+    }
 
   //Dont uncomment this, itll create problems
 //   var g = svg.append("g");
@@ -195,20 +193,28 @@ d3.csv("data/data.csv", function(error, data) {
 
 // add the brush target area on the overview chart
 //This is the rectangle that highlights what part of the graph youre looking at
-overview.append("g")
-            .attr("class", "x brush")
-            .call(brush)
+var g3 = overview.append("g")
+            .attr("class", "x brush");
+
+
+            g3.call(brush)
             .selectAll("rect")
 
 
-                // -6 is magic number to offset positions for styling/interaction to feel right
-                .attr("y", -6)
+                // 15 is magic number to offset positions for styling/interaction to feel right
+                .attr("y", 35)
                 // need to manually set the height because the brush has
                 // no y scale, i.e. we should see the extent being marked
                 // over the full height of the overview chart
-                .attr("height", heightOverview + 7);  // +7 is magic number for styling
+                .attr("height", heightOverview - 9);  // - 20 is magic number for styling
 
-      //put all the dots on
+g3.append("line")
+        .attr("x1", "0")
+        .attr("x2", width - 90)
+        .attr("y1", 60)
+        .attr("y2", 60)
+        .attr("style","stroke:rgb(0,0,0);stroke-width:1");
+
 
 
 
@@ -354,4 +360,12 @@ function showHideDots() {
 <br>
     <input type="checkbox" id="logCheck"> Log Scale
 </body>
+<script type="text/javascript">
+  $(document).ready(function(){
+      $("#legendContainer").append($('#logCheck'));
+
+  });
+
+
+</script>
 
