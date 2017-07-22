@@ -95,7 +95,7 @@ var svg = d3.select("body").append("svg")
     .attr("height", height + margin.top + margin.bottom);
 
 var svg2 = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
+    .attr("width", 150 + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom);
     
 
@@ -226,7 +226,7 @@ overview.append("g")
 
 
   legend.append("rect")
-      .attr("x", width - 18)
+      .attr("x", 150 - 18)
       .attr("width", 18)
       .attr("height", 18)
       .attr("color", color)
@@ -240,7 +240,7 @@ overview.append("g")
       });
 
   legend.append("text")
-      .attr("x", width - 24)
+      .attr("x", 150 - 24)
       .attr("y", 9)
       .attr("dy", ".35em")
       .style("text-anchor", "end")
