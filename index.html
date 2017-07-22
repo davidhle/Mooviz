@@ -145,16 +145,22 @@ d3.csv("data/data.csv", function(error, data) {
   xOverview.domain(x.domain());
   yOverview.domain(y.domain());
 
+  //Commented this out for now = some merge conflict that might break stuff for now
+// <<<<<<< MoreXAxisEnhancement
+//   //This is a random comment to allow another pull request
+// =======
 
-    // stuff for log axis
-var logTickValues = [];
-var logNumOfTicks = 10;
-    for (var i = 10; i < maxSales; i*=10) {
-      logTickValues.push(i);
-    }
+//     // stuff for log axis
+// var logTickValues = [];
+// var logNumOfTicks = 10;
+//     for (var i = 10; i < maxSales; i*=10) {
+//       logTickValues.push(i);
+//     }
 
-  var g = svg.append("g");
+  //Dont uncomment this, itll create problems
+//   var g = svg.append("g");
 
+// >>>>>>> master
 
     //put the x axis on
   g.append("g")
