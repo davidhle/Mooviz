@@ -82,7 +82,8 @@ var xOverview = d3.time.scale()
 
 
 var yOverview = d3.scale.linear()
-                .range([heightOverview, 0]);
+                .range([heightOverview, 0])
+
 //Rendering for the x axis
 var xAxisOverview = d3.svg.axis()
                     .scale(xOverview)
@@ -143,10 +144,6 @@ d3.csv("data/data.csv", function(error, data) {
   xOverview.domain(x.domain());
   yOverview.domain(y.domain());
 
-  //Commented this out for now = some merge conflict that might break stuff for now
-// <<<<<<< MoreXAxisEnhancement
-//   //This is a random comment to allow another pull request
-// =======
 
     // stuff for log axis
 var logTickValues = [];
@@ -154,11 +151,6 @@ var logNumOfTicks = 10;
     for (var i = 10; i < maxSales; i*=10) {
       logTickValues.push(i);
     }
-
-  //Dont uncomment this, itll create problems
-//   var g = svg.append("g");
-
-// >>>>>>> master
 
     //put the x axis on
   g.append("g")
@@ -324,11 +316,20 @@ g3.append("line")
 function brushed() {
         // update the main chart's x axis data range
         x.domain(brush.empty() ? xOverview.domain() : brush.extent());
+        x.range([0, width - 90]);
+
         // redraw the bars on the main chart
         g.selectAll(".dot")
                 .attr("cx", function(d) { return x(d.date); })
         // redraw the x axis of the main chart
         g.select(".x.axis").call(xAxis);
+
+
+        // hides everything that is to the left of the y axis
+        $('.dot').each(function() {
+          if ($(this).attr('cx') < 0) $(this).css("visibility","collapse");
+          else $(this).css("visibility","visible");
+        })
     }
 
 function toggle(genre) {
@@ -361,11 +362,6 @@ function showHideDots() {
     <input type="checkbox" id="logCheck"> Log Scale
 </body>
 <script type="text/javascript">
-  $(document).ready(function(){
-      $("#legendContainer").append($('#logCheck'));
-
-  });
-
 
 </script>
 
