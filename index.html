@@ -21,33 +21,32 @@
 </head>
 
 <style>
-
+  
 body {
   font: 12px Comic;
   text-align: center;
+
 }
 
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
 }
 .brush .extent {
-        fill-opacity: .125;
-    }
-/*.dot {
-  stroke: #000;
-}*/
+    fill-opacity: .125;
+}
 
 .tooltip {
-  position: absolute;
-  width: 200px;
-  height: 28px;
-  pointer-events: none;
+    position: absolute;
+    width: 200px;
+    height: 28px;
+    pointer-events: none;
 }
 
 </style>
+
 <body>
 
     <div class="container">
@@ -63,30 +62,45 @@ body {
 <!-- bootstrap -->
 <script src="js/bootstrap.min.js"></script>
 
-<script>
+
+  <script>
+// set up margins for the graph and the margins for the zoomable bar
+var margin = {
+        top: 20,
+        right: 20,
+        bottom: 80,
+        left: 40
+    },
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
+    marginOverview = {
+        top: 430,
+        right: margin.right,
+        bottom: 35,
+        left: margin.left
+    },
+    heightOverview = 500 - marginOverview.top - marginOverview.bottom;
 
 //setup formula for date format that will be used later
 var format = function(input) {
-    return (new Date(input)).getTime();
+    return (new Date(input))
+        .getTime();
 }
 
 // variable for storing which of the genres are selected
 var selectedGenres = {};
 
 // add the tooltip area to the webpage
-var tooltip = d3.select("body").append("div")
+var tooltip = d3.select("body")
+    .append("div")
     .attr("class", "tooltip")
     .style("background", "white")
     .style("border-color", "black");
 
-// set up margins for the graph and the margins for the zoomable bar
-var margin = {top: 20, right: 20, bottom: 80, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom,
-    marginOverview = { top: 430, right: margin.right, bottom: 35,  left: margin.left},
-    heightOverview = 500 - marginOverview.top - marginOverview.bottom;
+
 // specify type of scale and range of the x axis
-var x = d3.time.scale().range([0, width - 90]);
+var x = d3.time.scale()
+    .range([0, width - 90]);
 
 //specify type of scale and range of the y axis
 var y = d3.scale.linear()
@@ -102,45 +116,48 @@ var xAxis = d3.svg.axis()
 
 // set up y axis
 var yAxis = d3.svg.axis()
-.tickFormat(d3.format("s"))
+    .tickFormat(d3.format("s"))
     .scale(y)
     .orient("left");
 
 //Set up axis for the overview / zoom bar
 var xOverview = d3.time.scale()
-                .range([0, width - 90]);
-
+    .range([0, width - 90]);
 
 var yOverview = d3.scale.linear()
-                .range([heightOverview, 0]);
-//Rendering for the x axis
-var xAxisOverview = d3.svg.axis()
-                    .scale(xOverview)
-                    .orient("bottom");
+    .range([heightOverview, 0])
+
 // set up svg
-var svg = d3.select("body").append("svg")
+var svg = d3.select("body")
+    .append("svg")
     .attr("width", width - 40)
     .attr("height", height + margin.top + margin.bottom);
 
-var svg2 = d3.select("body").append("svg")
+var svg2 = d3.select("body")
+    .append("svg")
     .attr("width", 150 + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom);
 
-
 //svg for the bar itself
- var overview = svg.append("g")
-                .attr("class", "overview")
-                .attr("transform", "translate(" + marginOverview.left +"," + marginOverview.top + ")");
+var overview = svg.append("g")
+    .attr("class", "overview")
+    .attr("transform", "translate(" + marginOverview.left + "," +
+        marginOverview.top + ")");
 
+//Rendering for the x axis
+var xAxisOverview = d3.svg.axis()
+    .scale(xOverview)
+    .orient("bottom");
 
 //The zoom and pan function of the bottom bar
 var brush = d3.svg.brush()
-                        .x(xOverview)
-                        .on("brush", brushed);
+    .x(xOverview)
+    .on("brush", brushed);
 
 //Declare g and g2
 var g = svg.append("g")
-            .attr("transform", "translate(" + margin.left  + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
   var g2 = svg2.append("g")
     .attr("transform", "translate(" + 60 + ",0)")
@@ -149,204 +166,212 @@ var g = svg.append("g")
 
 // get the data and process it
 d3.csv("data/data.csv", function(error, data) {
-  if (error) throw error;
+    if (error) throw error;
 
-  // get the values in the right format
-  data.forEach(function(d) {
-    //log scale to better see data
-    d.salesLog = Math.log(+d.salesAdj);
-    d.sales = +d.salesAdj;
-    d.date = format(d.date);
-    d.genreClean = d.genre.replace(/\s+/, "").replace('/', '');
-  });
-
-
-  var maxSales = d3.max(data, function(d) { return d.sales; });
-    var maxSalesLog = d3.max(data, function(d) { return d.salesLog; });
+    // get the values in the right format
+    data.forEach(function(d) {
+        //log scale to better see data
+        d.salesLog = Math.log(+d.salesAdj);
+        d.sales = +d.salesAdj;
+        d.date = format(d.date);
+        d.genreClean = d.genre.replace(/\s+/, "")
+            .replace('/', '');
+    });
 
 
-  // specify domains for x and y
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([.1, maxSales]);
+    var maxSales = d3.max(data, function(d) {
+        return d.sales;
+    });
 
-  //These are the domains for the bottom zoom
-  xOverview.domain(x.domain());
-  yOverview.domain(y.domain());
-
-  //Commented this out for now = some merge conflict that might break stuff for now
-// <<<<<<< MoreXAxisEnhancement
-//   //This is a random comment to allow another pull request
-// =======
-
-    // stuff for log axis
-var logTickValues = [];
-var logNumOfTicks = 10;
-    for (var i = 10; i < maxSales; i*=10) {
-      logTickValues.push(i);
+    // stuff for log axis on the y
+    var logTickValues = [];
+    var baseOfAxisTicks = 10;
+    for (var i = baseOfAxisTicks; i < maxSales; i *= baseOfAxisTicks) {
+        logTickValues.push(i);
     }
 
-  //Dont uncomment this, itll create problems
-//   var g = svg.append("g");
+    // specify domains for x and y
+    x.domain(d3.extent(data, function(d) {
+        return d.date;
+    }));
+    y.domain([.1, maxSales]);
 
-// >>>>>>> master
+    //These are the domains for the bottom zoom
+    xOverview.domain(x.domain());
+    yOverview.domain(y.domain());
 
     //put the x axis on
-  g.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("x", width - 80)
-      .attr("y", heightOverview - 10)
-      .style("text-anchor", "end")
-      .text("date")
-      .style("font-size", "15px");
 
-      // put the y axis on
-  g.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Earnings")
-      .style("font-size", "15px");
+    g.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("x", width - 80)
+        .attr("y", heightOverview - 10)
+        .style("text-anchor", "end")
+        .text("date");
 
-
-  overview.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + heightOverview + ")")
-            .call(xAxisOverview);
+    // put the y axis on
+    g.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Earnings");
 
 
-// add the brush target area on the overview chart
-//This is the rectangle that highlights what part of the graph youre looking at
-var g3 = overview.append("g")
-            .attr("class", "x brush");
+    overview.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + heightOverview + ")")
+        .call(xAxisOverview);
 
 
-            g3.call(brush)
-            .selectAll("rect")
+    // add the brush target area on the overview chart
+    //This is the rectangle that highlights what part of the graph youre looking at
+    var g3 = overview.append("g")
+        .attr("class", "x brush");
 
+    g3.call(brush)
+        .selectAll("rect")
 
-                // 15 is magic number to offset positions for styling/interaction to feel right
-                .attr("y", 35)
-                // need to manually set the height because the brush has
-                // no y scale, i.e. we should see the extent being marked
-                // over the full height of the overview chart
-                .attr("height", heightOverview - 9);  // - 20 is magic number for styling
+    // 15 is magic number to offset positions for styling/interaction to feel right
+    .attr("y", 35)
+        // need to manually set the height because the brush has
+        // no y scale, i.e. we should see the extent being marked
+        // over the full height of the overview chart
+        .attr("height", heightOverview - 9); // - 20 is magic number for styling
 
-g3.append("line")
+    g3.append("line")
+
         .attr("x1", "0")
         .attr("x2", width - 90)
         .attr("y1", 60)
         .attr("y2", 60)
-        .attr("style","stroke:rgb(0,0,0);stroke-width:1");
+
+        .attr("style", "stroke:rgb(0,0,0);stroke-width:1");
+
+    //Put all the dots on
+    g.selectAll(".dot")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("r", 2)
+        .attr("class", function(d) {
+            return "dot " + d.genreClean;
+        })
+        .attr("cx", function(d) {
+            return x(d.date);
+        }) //x coordinate of dot
+        .attr("cy", function(d) {
+            return y(d.sales);
+        }) // y coordinate of dot
+        .attr("sales", function(d) {
+            return d.sales;
+        }) // sae
+        .style("fill", function(d) {
+            return color(d.genreClean);
+        }) // gives dot color
+        .on("mouseover", function(d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(d["title"] + "<br/> (" + d.genre +
+                    ", " + d.sales.toLocaleString() + ")")
+                .style("left", (d3.event.pageX + 5) + "px")
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("right", (d3.event.pageX - 150 + "px"));
+        })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+    // legend stuff
+    var legend = g2.selectAll(".legend")
+        .data(color.domain())
+        .enter()
+        .append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) {
+            return "translate(0," + i * 20 + ")";
+        });
 
 
+    legend.append("rect")
+        .attr("x", 90 - 18)
+        .attr("width", 18)
+        .attr("height", 18)
+        .attr("color", color)
+        .attr("class", function(d) {
+            return "legend" + d;
+        })
+        .style("fill", color)
+        .on('click', function(d) {
+            toggle(d);
+            showHideDots();
+        });
 
+    legend.append("text")
+        .attr("x", 90 - 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) {
+            selectedGenres[d] = false;
+            return d;
+        });
 
-
-  //Put all the dots on
-  g.selectAll(".dot")
-      .data(data)
-    .enter().append("circle")
-      .attr("r", 4)
-      .attr("class", function(d) {return "dot " + d.genreClean; } )
-      .attr("cx", function(d) { return x(d.date); }) //x coordinate of dot
-      .attr("cy", function(d) { return y(d.sales); }) // y coordinate of dot
-      .attr("sales", function(d) { return d.sales; }) // sae
-      .style("fill", function(d) { return color(d.genreClean); }) // gives dot color
-      .on("mouseover", function(d) {
-          tooltip.transition()
-               .duration(200)
-               .style("opacity", .9);
-          tooltip.html(d["title"] + "<br/> (" + d.genre
-            + ", " + d.sales.toLocaleString() + ")")
-               .style("left", (d3.event.pageX + 5) + "px")
-               .style("top", (d3.event.pageY - 28) + "px")
-               .style("right", (d3.event.pageX - 150 + "px"));
-      })
-      .on("mouseout", function(d) {
-          tooltip.transition()
-               .duration(500)
-               .style("opacity", 0);
-           });
-
-// legend stuff
-  var legend = g2.selectAll(".legend")
-      .data(color.domain())
-    .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-
-  legend.append("rect")
-      .attr("x", 90 - 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .attr("color", color)
-      .attr("class", function(d) {
-        return "legend" + d;
-      })
-      .style("fill", color)
-      .on('click', function(d) {
-        toggle(d);
-        showHideDots();
-      });
-
-  legend.append("text")
-      .attr("x", 90 - 24)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text(function(d) {
-        selectedGenres[d] = false;
-        return d; });
-
-  d3.select("#logCheck").on("change", updateYAxis);
+    d3.select("#logCheck")
+        .on("change", updateYAxis);
 
     // ** Update data section (Called from the onclick)
     function updateYAxis() {
-      if ($('#logCheck').prop("checked") == true) {
+        if ($('#logCheck')
+            .prop("checked") == true) {
 
-        y = d3.scale.log()
-        .range([height, 0]);
+            y = d3.scale.log()
+                .range([height, 0]);
 
-        yAxis = d3.svg.axis()
-        .tickFormat(d3.format("s"))
-        .scale(y)
-        .orient("left");
+            yAxis = d3.svg.axis()
+                .tickFormat(d3.format("s"))
+                .scale(y)
+                .orient("left");
 
-        yAxis.tickValues(logTickValues);
-      } else {
-        y = d3.scale.linear()
-        .range([height, 0]);
+            yAxis.tickValues(logTickValues);
+        } else {
+            y = d3.scale.linear()
+                .range([height, 0]);
 
-        yAxis = d3.svg.axis()
-        .tickFormat(d3.format("s"))
-        .scale(y)
-        .orient("left");
-      }
+            yAxis = d3.svg.axis()
+                .tickFormat(d3.format("s"))
+                .scale(y)
+                .orient("left");
+        }
 
-          // Scale the range of the data again
-          y.domain([.001, maxSales]);
+        // Scale the range of the data again
+        y.domain([.001, maxSales]);
 
-          // Select the section we want to apply our changes to
-          var svg = d3.select("body").transition();
+        // Select the section we want to apply our changes to
+        var svg = d3.select("body")
+            .transition();
 
         // Make the changes
-            svg.select(".y.axis") // change the y axis
+        svg.select(".y.axis") // change the y axis
             .duration(750)
             .call(yAxis);
 
-            g.selectAll('.dot')
-              .attr("cy", function(d) { return y(d.sales); });
-          }
+        g.selectAll('.dot')
+            .attr("cy", function(d) {
+                return y(d.sales);
+            });
+    }
 
 
 
@@ -354,48 +379,68 @@ g3.append("line")
 
 //This is the brush function that allows us to pan/zoom the camera
 function brushed() {
-        // update the main chart's x axis data range
-        x.domain(brush.empty() ? xOverview.domain() : brush.extent());
-        // redraw the bars on the main chart
-        g.selectAll(".dot")
-                .attr("cx", function(d) { return x(d.date); })
+    // update the main chart's x axis data range
+    x.domain(brush.empty() ? xOverview.domain() : brush.extent());
+    x.range([0, width - 90]);
+
+    // redraw the bars on the main chart
+    g.selectAll(".dot")
+        .attr("cx", function(d) {
+            return x(d.date);
+        })
+        .classed("offGraph", function(d) {
+            return x(d.date) < 0 ? true : false;
+        });
         // redraw the x axis of the main chart
-        g.select(".x.axis").call(xAxis);
-    }
+    g.select(".x.axis")
+        .call(xAxis);
+
+    showHideDots();
+}
 
 function toggle(genre) {
-  selectedGenres[genre] = !selectedGenres[genre];
+    selectedGenres[genre] = !selectedGenres[genre];
 }
 
 function showHideDots() {
 
-  var showAll = true;
+    // genre filter stuff
+    var showAll = true;
 
-  for (var genre in selectedGenres) {
-    if (selectedGenres[genre] == true) {
-      showAll = false;
-      $("." + genre).css("visibility","visible");
-      $(".legend" + genre).css("opacity",.9);
-    } else {
-      $("." + genre).css("visibility","collapse");
-      $(".legend" + genre).css("opacity",.3);
+    for (var genre in selectedGenres) {
+        if (selectedGenres[genre] == true) {
+            showAll = false;
+            $("." + genre)
+                .css("visibility", "visible");
+            $(".legend" + genre)
+                .css("opacity", .9);
+        } else {
+            $("." + genre)
+                .css("visibility", "collapse");
+            $(".legend" + genre)
+                .css("opacity", .3);
+        }
     }
-  }
 
-  if (showAll) {
-    $(".dot").css("visibility","visible");
-    $(".legend rect").css("opacity",.9);
-  }
+    // hide all dots that are off the graph regardless
+    $(".dot.offGraph").css("visibility", "collapse");
+
+    // case if you want to show everything
+    if (showAll) {
+        $(".dot:not(.offGraph)")
+            .css("visibility", "visible");
+        $(".legend rect")
+            .css("opacity", .9);
+    }
+
 }
-
 </script>
 <br>
-    <input type="checkbox" id="logCheck"> Log Scale </input>
-<script type="text/javascript">
-  $(document).ready(function(){
-      $("#legendContainer").append($('#logCheck'));
 
-  });
+<input type="checkbox" id="logCheck"> Log Scale
+</body>
+<script type="text/javascript">
+
 </script>
 <footer class="footer">
   <div class="container">
