@@ -21,9 +21,10 @@
 </head>
 
 <style>
-  
+
 body {
-  font: 12px Comic;
+    font: Comic;
+  font-size: 12px;
   text-align: center;
 
 }
@@ -41,7 +42,6 @@ body {
 .tooltip {
     position: absolute;
     width: 200px;
-    height: 28px;
     pointer-events: none;
 }
 
@@ -95,7 +95,7 @@ var tooltip = d3.select("body")
     .append("div")
     .attr("class", "tooltip")
     .style("background", "white")
-    .style("border-color", "black");
+    .style("stroke", "black");
 
 
 // specify type of scale and range of the x axis
@@ -210,8 +210,7 @@ d3.csv("data/data.csv", function(error, data) {
         .attr("class", "label")
         .attr("x", width - 80)
         .attr("y", heightOverview - 10)
-        .style("text-anchor", "end")
-        .text("date");
+        .style("text-anchor", "end");
 
     // put the y axis on
     g.append("g")
@@ -223,7 +222,8 @@ d3.csv("data/data.csv", function(error, data) {
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Earnings");
+        .text("Earnings")
+        .style("font-size", "15px");
 
 
     overview.append("g")
@@ -261,7 +261,7 @@ d3.csv("data/data.csv", function(error, data) {
         .data(data)
         .enter()
         .append("circle")
-        .attr("r", 2)
+        .attr("r", 4)
         .attr("class", function(d) {
             return "dot " + d.genreClean;
         })
@@ -281,8 +281,8 @@ d3.csv("data/data.csv", function(error, data) {
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html(d["title"] + "<br/> (" + d.genre +
-                    ", " + d.sales.toLocaleString() + ")")
+            tooltip.html("<b>" + d["title"] + "</b><br/>$" + (d.salesAdj).toLocaleString() +
+                    "<br>" + d.genre)
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px")
                 .style("right", (d3.event.pageX - 150 + "px"));
@@ -440,7 +440,7 @@ function showHideDots() {
 <input type="checkbox" id="logCheck"> Log Scale
 </body>
 <script type="text/javascript">
-
+d3.select("#legendContainer").append(d3.select('#logCheck'));
 </script>
 <footer class="footer">
   <div class="container">
