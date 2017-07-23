@@ -1,12 +1,25 @@
 <!DOCTYPE html>
+<html lang="en">
 <meta charset="utf-8">
 
 <!-- Original Source https://bl.ocks.org/mbostock/3887118 -->
 
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mooviz: A Movie Information Visualization</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/sticky-footer.css" rel="stylesheet">
+</head>
+
 <style>
 
 body {
-  font: 10px sans-serif;
+  font: 12px Comic;
+  text-align: center;
 }
 
 .axis path,
@@ -31,8 +44,19 @@ body {
 
 </style>
 <body>
+
+    <div class="container">
+      <div class="page-header">
+        <h1>Mooviz</h1>
+      </div>
+      <p class="lead">An information visualization on movie data designed by <a href="http://github.com/karachtani" target="_blank">Karan Achtani</a>, <a href="http://github.com/pkalaga1" target="_blank">Pravan Kalaga</a>, and <a href="http://github.com/davidhle" target="_blank">David Le</a></p>
+    </div>
+
 <script src="//d3js.org/d3.v3.min.js"></script>
+<!-- jquery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- bootstrap -->
+<script src="js/bootstrap.min.js"></script>
 
 <script>
 
@@ -47,7 +71,8 @@ var selectedGenres = {};
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
-    .style("background", "white");
+    .style("background", "white")
+    .style("border-color", "black");
 
 // set up margins for the graph and the margins for the zoomable bar
 var margin = {top: 20, right: 20, bottom: 80, left: 40},
@@ -113,7 +138,7 @@ var g = svg.append("g")
             .attr("transform", "translate(" + margin.left  + "," + margin.top + ")");
 
   var g2 = svg2.append("g")
-    .attr("transform", "translate(" + 50 + ",0)")
+    .attr("transform", "translate(" + 60 + ",0)")
     .attr("id", "#legendContainer");
 
 
@@ -170,7 +195,8 @@ var logNumOfTicks = 10;
       .attr("x", width - 80)
       .attr("y", heightOverview - 10)
       .style("text-anchor", "end")
-      .text("date");
+      .text("date")
+      .style("font-size", "15px");
 
       // put the y axis on
   g.append("g")
@@ -182,7 +208,8 @@ var logNumOfTicks = 10;
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Earnings");
+      .text("Earnings")
+      .style("font-size", "15px");
 
 
   overview.append("g")
@@ -223,7 +250,7 @@ g3.append("line")
   g.selectAll(".dot")
       .data(data)
     .enter().append("circle")
-      .attr("r", 2)
+      .attr("r", 4)
       .attr("class", function(d) {return "dot " + d.genreClean; } )
       .attr("cx", function(d) { return x(d.date); }) //x coordinate of dot
       .attr("cy", function(d) { return y(d.sales); }) // y coordinate of dot
@@ -358,14 +385,17 @@ function showHideDots() {
 
 </script>
 <br>
-    <input type="checkbox" id="logCheck"> Log Scale
-</body>
+    <input type="checkbox" id="logCheck"> Log Scale </input>
 <script type="text/javascript">
   $(document).ready(function(){
       $("#legendContainer").append($('#logCheck'));
 
   });
-
-
 </script>
-
+<footer class="footer">
+  <div class="container">
+    <p class="text-muted">Information visualization designed for Barbara Ericson's Information Visualization Summer 2017 class</p>
+  </div>
+</footer>
+</body>
+</html>
