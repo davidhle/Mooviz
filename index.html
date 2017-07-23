@@ -21,9 +21,10 @@
 </head>
 
 <style>
-  
+
 body {
-  font: 12px Comic;
+    font: Comic;
+  font-size: 12px;
   text-align: center;
 
 }
@@ -34,6 +35,7 @@ body {
     stroke: #000;
     shape-rendering: crispEdges;
 }
+
 .brush .extent {
     fill-opacity: .125;
 }
@@ -41,7 +43,6 @@ body {
 .tooltip {
     position: absolute;
     width: 200px;
-    height: 28px;
     pointer-events: none;
 }
 
@@ -53,7 +54,7 @@ body {
       <div class="page-header">
         <h1>Mooviz</h1>
       </div>
-      <p class="lead">An information visualization on movie data designed by <a href="http://github.com/karachtani" target="_blank">Karan Achtani</a>, <a href="http://github.com/pkalaga1" target="_blank">Pravan Kalaga</a>, and <a href="http://github.com/davidhle" target="_blank">David Le</a></p>
+      <p class="lead">An information visualization of Box Office earnings&#42; since 1990. Designed by <a href="http://github.com/karachtani" target="_blank">Karan Achtani</a>, <a href="http://github.com/pkalaga1" target="_blank">Pravan Kalaga</a>, and <a href="http://github.com/davidhle" target="_blank">David Le</a></p>
     </div>
 
 <script src="//d3js.org/d3.v3.min.js"></script>
@@ -95,7 +96,7 @@ var tooltip = d3.select("body")
     .append("div")
     .attr("class", "tooltip")
     .style("background", "white")
-    .style("border-color", "black");
+    .style("stroke", "black");
 
 
 // specify type of scale and range of the x axis
@@ -210,8 +211,7 @@ d3.csv("data/data.csv", function(error, data) {
         .attr("class", "label")
         .attr("x", width - 80)
         .attr("y", heightOverview - 10)
-        .style("text-anchor", "end")
-        .text("date");
+        .style("text-anchor", "end");
 
     // put the y axis on
     g.append("g")
@@ -222,8 +222,7 @@ d3.csv("data/data.csv", function(error, data) {
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
         .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Earnings");
+        .style("text-anchor", "end");
 
 
     overview.append("g")
@@ -261,7 +260,7 @@ d3.csv("data/data.csv", function(error, data) {
         .data(data)
         .enter()
         .append("circle")
-        .attr("r", 2)
+        .attr("r", 4)
         .attr("class", function(d) {
             return "dot " + d.genreClean;
         })
@@ -281,8 +280,9 @@ d3.csv("data/data.csv", function(error, data) {
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html(d["title"] + "<br/> (" + d.genre +
-                    ", " + d.sales.toLocaleString() + ")")
+            tooltip.html("<b>" + d["title"] + "</b> ("
+                + (new Date(d.date)).toLocaleDateString("en-US") + ")<br/>$"
+                + d.sales.toLocaleString() + "<br>" + d.genre)
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px")
                 .style("right", (d3.event.pageX - 150 + "px"));
@@ -327,6 +327,15 @@ d3.csv("data/data.csv", function(error, data) {
             selectedGenres[d] = false;
             return d;
         });
+
+        g2.append("foreignObject")
+   .attr("height", "20")
+   .attr("width", "100")
+    .attr('x', "0")
+    .attr('y',  "300")
+   .attr('height', 20)
+   .append("xhtml:body")
+   .html("<br><br><text x='45' y='9' dy='.35em' style='text-anchor: end;'> Log Scale  </text>&nbsp<input type='checkbox' id='logCheck'>");
 
     d3.select("#logCheck")
         .on("change", updateYAxis);
@@ -435,17 +444,14 @@ function showHideDots() {
 
 }
 </script>
-<br>
-
-<input type="checkbox" id="logCheck"> Log Scale
 </body>
-<script type="text/javascript">
 
-</script>
 <footer class="footer">
   <div class="container">
-    <p class="text-muted">Information visualization designed for Barbara Ericson's Information Visualization Summer 2017 class</p>
-    <a href="https://github.com/davidhle/Mooviz" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+    <p class="text-muted">Information visualization designed for Georgia Tech's Intro to Information Visualization (CS4460), taught by Barbara Ericson during Summer 2017.</p>
+    <p class="text-muted">&#42;Box office earnings as of July 10, 2017 reported by <a href="http://www.the-numbers.com/" target="_blank"> The Numbers </a>. Earnings are
+    inflation adjusted to the value of the US Dollar as of July 18, 2017 as reported by the <a href="https://data.bls.gov"> Bureau of Labor Statistics</a>. </p>
+    <a target="_blank" href="https://github.com/davidhle/Mooviz" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
   </div>
 </footer>
 </body>
