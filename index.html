@@ -36,6 +36,12 @@ body {
     shape-rendering: crispEdges;
 }
 
+#overviewAxis path, #overviewAxis line {
+    fill: none;
+    stroke: silver;
+    shape-rendering: crispEdges;
+}
+
 .brush .extent {
     fill-opacity: .125;
 }
@@ -141,7 +147,7 @@ var svg2 = d3.select("body")
 
 //svg for the bar itself
 var overview = svg.append("g")
-    .attr("class", "overview")
+    .attr("id", "overviewAxis")
     .attr("transform", "translate(" + marginOverview.left + "," +
         marginOverview.top + ")");
 
@@ -160,7 +166,7 @@ var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-  var g2 = svg2.append("g")
+var g2 = svg2.append("g")
     .attr("transform", "translate(" + 60 + ",0)")
     .attr("id", "#legendContainer");
 
@@ -226,9 +232,10 @@ d3.csv("data/data.csv", function(error, data) {
 
 
     overview.append("g")
-        .attr("class", "x axis")
+        .attr("class", "x axis overview")
         .attr("transform", "translate(0," + heightOverview + ")")
-        .call(xAxisOverview);
+        .call(xAxisOverview)
+        .style("fill", "silver");
 
 
     // add the brush target area on the overview chart
@@ -236,24 +243,30 @@ d3.csv("data/data.csv", function(error, data) {
     var g3 = overview.append("g")
         .attr("class", "x brush");
 
+    g3.append('text')
+        .html("Click and drag to select a range of time.")
+        .attr("y", 35 - 5)
+        .attr("x", (width - 90) / 2)
+        .attr("text-anchor", "middle")
+        .style("font-size", "10px")
+        .style("fill", "silver");
+
     g3.call(brush)
         .selectAll("rect")
 
-    // 15 is magic number to offset positions for styling/interaction to feel right
+    // 35 is magic number to offset positions for styling/interaction to feel right
     .attr("y", 35)
         // need to manually set the height because the brush has
         // no y scale, i.e. we should see the extent being marked
         // over the full height of the overview chart
-        .attr("height", heightOverview - 9); // - 20 is magic number for styling
+        .attr("height", heightOverview - 9); // - 9 is magic number for styling
 
     g3.append("line")
-
         .attr("x1", "0")
         .attr("x2", width - 90)
         .attr("y1", 60)
         .attr("y2", 60)
-
-        .attr("style", "stroke:rgb(0,0,0);stroke-width:1");
+        .attr("style", "stroke:silver;stroke-width:1");
 
     //Put all the dots on
     g.selectAll(".dot")
@@ -329,16 +342,31 @@ d3.csv("data/data.csv", function(error, data) {
         });
 
         g2.append("foreignObject")
-   .attr("height", "20")
-   .attr("width", "100")
-    .attr('x', "0")
-    .attr('y',  "300")
-   .attr('height', 20)
-   .append("xhtml:body")
-   .html("<br><br><text x='45' y='9' dy='.35em' style='text-anchor: end;'> Log Scale  </text>&nbsp<input type='checkbox' id='logCheck'>");
+        .attr("")
+
+        g2.append("foreignObject")
+        .attr("height", "20")
+        .attr("width", "100")
+        .attr('x', "0")
+        .attr('y',  "300")
+        .attr('height', 20)
+        .append("xhtml:body")
+        .html("<button style='margin:5px' type='button' id='showAllGenresBtn'>Show All</button><br><br>" +
+                "<text x='45' y='9' dy='.35em' style='text-anchor: end;'>" +
+                " Log Scale  </text>&nbsp<input type='checkbox' id='logCheck'>");
+
+
 
     d3.select("#logCheck")
         .on("change", updateYAxis);
+
+    d3.select("#showAllGenresBtn")
+        .on("click", function() {
+            for (var genre in selectedGenres) {
+                selectedGenres[genre] = false;
+            }
+            showHideDots();
+        });
 
     // ** Update data section (Called from the onclick)
     function updateYAxis() {
